@@ -19,8 +19,8 @@
         display block
         width 100%
   .dots
-    position relative
-    righ 0
+    position absolute
+    right 0
     left 0
     bottom 12px
     text-align center
@@ -139,6 +139,9 @@ export default {
         this.slider.next()
       }, this.interval)
     }
+  },
+  destroyed () {
+    clearTimeout(this.timer)
   }
 }
 </script>
