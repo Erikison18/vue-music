@@ -1,4 +1,4 @@
-<style lang="stylus" scoped>
+<style lang="stylus" scoped rel="stylesheet/stylus">
 .slider
   min-height 1px
   .slider-group

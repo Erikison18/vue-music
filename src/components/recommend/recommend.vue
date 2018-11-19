@@ -42,6 +42,11 @@
             color #ffffff
           .desc
             color rgba(255, 255, 255, 0.3)
+  .loading-container
+    position absolute
+    width 100%
+    top 50%
+    transform translateY(-50%)
 </style>
 
 <template>
@@ -52,7 +57,7 @@
             <slider>
               <div v-for="(item, index) in recommends" :key="index">
                 <a :href="item.linkUrl">
-                  <img @load=loadImage :src="item.picUrl">
+                  <img class="needsclick" @load=loadImage :src="item.picUrl">
                 </a>
               </div>
             </slider>
@@ -62,7 +67,7 @@
             <ul>
               <li class="item" v-for="(item, index) in descList" :key="index">
                 <div class="icon">
-                  <img :src="item.imgurl" width="60" height="60">
+                  <img v-lazy="item.imgurl" width="60" height="60">
                 </div>
                 <div class="text">
                   <h2 class="name">{{item.creator.name}}</h2>
@@ -71,6 +76,9 @@
               </li>
             </ul>
           </div>
+        </div>
+        <div class="loading-container" v-show="!descList.length">
+          <Loading></Loading>
         </div>
       </Scroll>
     </div>
@@ -81,11 +89,13 @@ import {getRecommend, getDiscList} from 'api/recommend'
 import {ERR_OK} from 'api/config'
 import Slider from 'base/slider/slider'
 import Scroll from 'base/scroll/scroll'
+import Loading from 'base/loading/loading'
 
 export default{
   components: {
     Slider,
-    Scroll
+    Scroll,
+    Loading
   },
   data () {
     return {
