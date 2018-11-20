@@ -8,10 +8,12 @@
         .tab-item
             flex: 1
             text-align center
+            span
+              color $color-text-l
+              padding-bottom 5px
             &.router-link-active
                 span
                     color $color-theme
-                    padding-bottom 5px
                     border-bottom 2px solid $color-theme
 </style>
 
