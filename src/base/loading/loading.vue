@@ -1,12 +1,18 @@
-<style lang="stylus" scoped>
+<style lang="stylus">
 @import '~common/stylus/variable'
-.loading
+
+.loading-container
+  position absolute
   width 100%
-  text-align center
-  .desc
-    line-height 20px
-    font-size $font-size-small
-    color $color-text-l
+  top 50%
+  transform translateY(-50%)
+  .loading
+    width 100%
+    text-align center
+    .desc
+      line-height 20px
+      font-size $font-size-small
+      color $color-text-l
 </style>
 
 <template>

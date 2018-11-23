@@ -9,6 +9,9 @@
 <template>
     <div class="singer">
         <listview :data="singerList"></listview>
+        <div class="loading-container" v-show="!singerList.length">
+          <Loading></Loading>
+        </div>
     </div>
 </template>
 
@@ -17,13 +20,15 @@ import {getSingerList} from 'api/singer'
 import {ERR_OK} from 'api/config'
 import Singer from 'common/js/singer'
 import Listview from 'base/listview/listview'
+import Loading from 'base/loading/loading'
 
 const HOT_NAME = '热门'
 const HOT_SINGER_LEN = 10
 
 export default{
   components: {
-    Listview
+    Listview,
+    Loading
   },
   data () {
     return {
@@ -38,7 +43,6 @@ export default{
       getSingerList().then((res) => {
         if (res.code === ERR_OK) {
           this.singerList = this._normalizeSinger(res.data.list)
-          console.log(this.singerList)
         }
       })
     },
@@ -68,7 +72,6 @@ export default{
           name: item.Fsinger_name
         }))
       })
-      console.log(map)
       // 数据处理为有序数组
       let hot = []
       let ret = []

@@ -42,11 +42,6 @@
             color #ffffff
           .desc
             color rgba(255, 255, 255, 0.3)
-  .loading-container
-    position absolute
-    width 100%
-    top 50%
-    transform translateY(-50%)
 </style>
 
 <template>
