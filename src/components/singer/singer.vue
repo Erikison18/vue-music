@@ -8,7 +8,8 @@
 
 <template>
     <div class="singer">
-        <listview :data="singerList"></listview>
+        <listview :data="singerList" @select="selectSinger"></listview>
+        <router-view></router-view>
         <div class="loading-container" v-show="!singerList.length">
           <Loading></Loading>
         </div>
@@ -21,6 +22,7 @@ import {ERR_OK} from 'api/config'
 import Singer from 'common/js/singer'
 import Listview from 'base/listview/listview'
 import Loading from 'base/loading/loading'
+import {mapMutations} from 'vuex'
 
 const HOT_NAME = '热门'
 const HOT_SINGER_LEN = 10
@@ -39,6 +41,12 @@ export default{
     this._getSingerList()
   },
   methods: {
+    selectSinger(singer) {
+      this.$router.push({
+        path: `/singer/${singer.id}`
+      })
+      this.setSinger(singer)
+    },
     _getSingerList () {
       getSingerList().then((res) => {
         if (res.code === ERR_OK) {
@@ -88,7 +96,10 @@ export default{
       })
 
       return hot.concat(ret)
-    }
+    },
+    ...mapMutations({
+      setSinger: 'SET_SINGER'
+    })
   }
 }
 </script>
