@@ -6,6 +6,7 @@
   width 100%
   top 50%
   transform translateY(-50%)
+  z-index 1000000
   .loading
     width 100%
     text-align center
