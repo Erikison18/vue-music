@@ -247,10 +247,10 @@
           <h2 class="subtitle" v-html="currentSong.singer"></h2>
         </div>
         <div class="middle"
-          @touchstart="middleStart"
-          @touchmove="middleMove"
-          @touchend="middleEnd">
-          <div class="middle-l">
+          @touchstart.prevent="middleStart"
+          @touchmove.prevent="middleMove"
+          @touchend.prevent="middleEnd">
+          <div class="middle-l" ref="middleL">
             <div class="cd-wrapper" ref="cdWrapper">
               <div class="cd" :class="cdCls">
                 <img class="image" :src="currentSong.image">
@@ -338,6 +338,7 @@ import Lyric from 'lyric-parser'
 import Srcoll from 'base/scroll/scroll'
 
 const transform = prefixStyle('transform')
+const transitionDuration = prefixStyle('transition-duration')
 
 export default {
   components: {
@@ -539,10 +540,39 @@ export default {
         return
       }
       const left = this.currentShow === 'cd' ? 0 : -window.innerWidth
-      const width = Math.min(Math.max(-window.innerWidth, left + deltaX), 0)
-      this.$refs.lyricList.$el.style[transform] = `translate3d(${width}px, 0, 0)`
+      const offsetWidth = Math.min(Math.max(-window.innerWidth, left + deltaX), 0)
+      this.touch.percent = Math.abs(offsetWidth / window.innerWidth)
+      this.$refs.lyricList.$el.style[transform] = `translate3d(${offsetWidth}px, 0, 0)`
+      this.$refs.lyricList.$el.style[transitionDuration] = `0ms`
+      this.$refs.middleL.style.opacity = 1 - this.touch.percent
     },
     middleEnd() {
+      let offsetWidth
+      let opacity
+      if (this.currentShow === 'cd') {
+        if (this.touch.percent > 0.1) {
+          offsetWidth = -window.innerWidth
+          opacity = 0
+          this.currentShow = 'lyric'
+        } else {
+          offsetWidth = 0
+          opacity = 1
+        }
+      } else {
+        if (this.touch.percent < 0.9) {
+          offsetWidth = 0
+          opacity = 1
+          this.currentShow = 'cd'
+        } else {
+          offsetWidth = -window.innerWidth
+          opacity = 0
+        }
+      }
+      const time = 300
+      this.$refs.lyricList.$el.style[transform] = `translate3d(${offsetWidth}px, 0, 0)`
+      this.$refs.lyricList.$el.style[transitionDuration] = `${time}ms`
+      this.$refs.middleL.style.opacity = opacity
+      this.$refs.middleL.style[transitionDuration] = `${time}ms`
     },
     format(interval) {
       interval = interval | 0
