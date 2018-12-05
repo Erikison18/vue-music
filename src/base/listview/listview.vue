@@ -8,7 +8,7 @@
   overflow hidden
   background $color-background
   .list-group
-    padding-tottom 30px
+    padding-bottom 30px
     .list-group-title
       height 30px
       line-height 30px
@@ -157,6 +157,9 @@ export default {
       let delta = (this.touch.y2 - this.touch.y1) / ANCHOR_HEIGHT | 0
       let anchorIndex = parseInt(this.touch.anchorIndex) + delta
       this._scrollTo(anchorIndex)
+    },
+    refresh() {
+      this.$refs.listview.refresh()
     },
     scroll(pos) {
       this.scrollY = pos.y

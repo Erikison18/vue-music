@@ -84,6 +84,16 @@
               width 100%
               height 100%
               border-radius 50%
+        .playing-lyric-wrapper
+          width 80%
+          margin  30px auto 0
+          overflow hidden
+          text-align center
+          .playing-lyric
+            height 20px
+            line-height 20px
+            font-size $font-size-medium
+            color $color-text-l
       .middle-r
         display inline-block
         vertical-align top
@@ -256,6 +266,9 @@
                 <img class="image" :src="currentSong.image">
               </div>
             </div>
+            <div class="playing-lyric-wrapper">
+              <div class="playing-lyric">{{playingLyric}}</div>
+            </div>
           </div>
           <Srcoll class="middle-r" ref="lyricList"
             :data="currentLyric && currentLyric.lines">
@@ -383,7 +396,8 @@ export default {
       radius: 32,
       currentLyric: null,
       currentLineNum: 0,
-      currentShow: 'cd'
+      currentShow: 'cd',
+      playingLyric: ''
     }
   },
   created() {
@@ -438,9 +452,16 @@ export default {
         return
       }
       this.setPlayingState(!this.playing)
+      if (this.currentLyric) {
+        this.currentLyric.togglePlay()
+      }
     },
     prevSong() {
       if (!this.songReady) {
+        return
+      }
+      if (this.playList.length === 1) {
+        this.loopSoog()
         return
       }
       let index = this.currentIndex - 1
@@ -454,6 +475,10 @@ export default {
       if (!this.songReady) {
         return
       }
+      if (this.playList.length === 1) {
+        this.loopSoog()
+        return
+      }
       let index = this.currentIndex + 1
       if (index === this.playList.length) {
         index = 0
@@ -464,6 +489,9 @@ export default {
     loopSoog() {
       this.$refs.audio.currentTime = 0
       this.$refs.audio.play()
+      if (this.currentLyric) {
+        this.currentLyric.seek()
+      }
     },
     ready() {
       this.songReady = true
@@ -475,9 +503,13 @@ export default {
       this.currentTime = e.target.currentTime
     },
     onPercentChange(percent) {
-      this.$refs.audio.currentTime = percent * this.currentSong.duration
+      const currentTime = percent * this.currentSong.duration
+      this.$refs.audio.currentTime = currentTime
       if (!this.playing) {
         this.$refs.audio.play()
+      }
+      if (this.currentLyric) {
+        this.currentLyric.seek(currentTime * 1000)
       }
     },
     changeMode() {
@@ -511,7 +543,10 @@ export default {
         if (this.playing) {
           this.currentLyric.play()
         }
-        console.log(this.currentLyric)
+      }).catch(() => {
+        this.currentLyric = null
+        this.playingLyric = ''
+        this.currentLineNum = 0
       })
     },
     handleLyric({lineNum, txt}) {
@@ -522,6 +557,7 @@ export default {
       } else {
         this.$refs.lyricList.scrollTo(0, 0, 1000)
       }
+      this.playingLyric = txt
     },
     middleStart(e) {
       this.touch.initiated = true
@@ -616,10 +652,13 @@ export default {
       if (newSong.id === oldSong.id) {
         return
       }
-      this.$nextTick(() => {
+      if (this.currentLyric) {
+        this.currentLyric.stop()
+      }
+      setTimeout(() => {
         this.$refs.audio.play()
         this.getLyric()
-      })
+      }, 1000)
     },
     playing(newPlaying) {
       this.$nextTick(() => {

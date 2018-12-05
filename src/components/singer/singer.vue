@@ -7,8 +7,8 @@
 </style>
 
 <template>
-    <div class="singer">
-        <listview :data="singerList" @select="selectSinger"></listview>
+    <div class="singer" ref="singer">
+        <listview :data="singerList" @select="selectSinger" ref="list"></listview>
         <router-view></router-view>
         <div class="loading-container" v-show="!singerList.length">
           <Loading></Loading>
@@ -23,11 +23,13 @@ import Singer from 'common/js/singer'
 import Listview from 'base/listview/listview'
 import Loading from 'base/loading/loading'
 import {mapMutations} from 'vuex'
+import {playlistMixin} from 'common/js/mixin'
 
 const HOT_NAME = '热门'
 const HOT_SINGER_LEN = 10
 
 export default{
+  mixins: [playlistMixin],
   components: {
     Listview,
     Loading
@@ -41,6 +43,11 @@ export default{
     this._getSingerList()
   },
   methods: {
+    handlePlaylist(playlist) {
+      const bottom = playlist.length > 0 ? '60px' : ''
+      this.$refs.singer.style.bottom = bottom
+      this.$refs.list.refresh()
+    },
     selectSinger(singer) {
       this.$router.push({
         path: `/singer/${singer.id}`
