@@ -104,7 +104,7 @@
       :probe-type="probeType" :listen-scroll="listenScroll"
       @scroll="scroll">
       <div class="song-list-wrapper">
-        <SongList :songs="songs" @select="selectItem"></SongList>
+        <SongList :songs="songs" @select="selectItem" :rank="rank"></SongList>
       </div>
     </Scroll>
     <div class="loading-container" v-show="!songs.length">
@@ -144,6 +144,10 @@ export default {
     title: {
       type: String,
       default: ''
+    },
+    rank: {
+      type: Boolean,
+      default: false
     }
   },
   data() {
