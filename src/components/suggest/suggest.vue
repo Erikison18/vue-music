@@ -33,7 +33,7 @@
 
 <template>
   <Scroll class="suggest" :data="result"
-  @scrollToEnd="searchMore" :pullup="pullup">
+  @scrollToEnd="searchMore" :pullup="pullup" ref="suggest">
     <ul class="suggest-list">
       <li class="suggest-item" v-for="(item, index) in result"
       :key="index">
@@ -86,12 +86,12 @@ export default {
   methods: {
     search() {
       this.hasMore = true
-      console.log(this.query, this.page, this.showSinger)
+      this.page = 1
+      this.$refs.suggest.scrollTo(0, 0)
       search(this.query, this.page, this.showSinger, perpage).then((res) => {
         if (res.code === ERR_OK) {
-          this.result = this._getResult(res.data)
+          this._getResult(res.data)
           this.checkMore(res.data)
-          console.log(this.result)
         }
       })
     },
@@ -110,18 +110,14 @@ export default {
       }
     },
     searchMore() {
-      console.log(8888888, this.hasMore)
       if (!this.hasMore) {
         return
       }
       this.page++
       search(this.query, this.page, this.showSinger, perpage).then((res) => {
         if (res.code === ERR_OK) {
-          console.log(res.data)
-          console.log(this.result)
-          this.result = this.result.concat(this._getResult(res.data))
+          this._getResult(res.data)
           this.checkMore(res.data)
-          console.log(this.result)
         }
       })
     },
@@ -132,26 +128,19 @@ export default {
       }
     },
     _getResult(data) {
-      let ret = []
-      if (data.zhida && data.zhida.singerid) {
-        ret.push({...data.zhida, ...{type: TYPE_SINGER}})
+      if (data.zhida && data.zhida.singerid && data.song.curpage === 1) {
+        this.result.push({...data.zhida, ...{type: TYPE_SINGER}})
       }
-      console.log(data)
       if (data.song) {
-        console.log(1111111111111111)
         data.song.list.forEach(musicData => {
           getSongVkey(musicData.songmid).then((res) => {
             const vkey = res.data.items[0].vkey
             if (musicData.songid && musicData.albummid) {
-              console.log(2222)
-              console.log(ret)
-              ret.push(createSong(musicData, vkey))
+              this.result.push(createSong(musicData, vkey))
             }
           })
         })
       }
-      console.log(ret)
-      return ret
     }
   },
   watch: {
