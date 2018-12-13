@@ -33,10 +33,11 @@
 
 <template>
   <Scroll class="suggest" :data="result"
-  @scrollToEnd="searchMore" :pullup="pullup" ref="suggest">
+  @scrollToEnd="searchMore" :pullup="pullup"
+  :beforeScroll="beforeScroll" @beforeScroll="listScroll" ref="suggest">
     <ul class="suggest-list">
       <li class="suggest-item" v-for="(item, index) in result"
-      :key="index">
+      :key="index" @click="selectItem(item)">
         <div class="icon">
           <i :class="getIconCls(item)"></i>
         </div>
@@ -46,6 +47,7 @@
       </li>
       <loading v-show="hasMore" title=""></loading>
     </ul>
+    <no-result v-show="result.length === 0 && !hasMore" title="抱歉，暂无搜索结果"></no-result>
   </Scroll>
 </template>
 
@@ -56,6 +58,9 @@ import {createSong} from 'common/js/song'
 import {getSongVkey} from 'api/singer'
 import Scroll from 'base/scroll/scroll'
 import Loading from 'base/loading/loading'
+import Singer from 'common/js/singer'
+import {mapMutations, mapActions} from 'vuex'
+import NoResult from 'base/no-result/no-result'
 
 const TYPE_SINGER = 'singer'
 const perpage = 20
@@ -63,7 +68,8 @@ const perpage = 20
 export default {
   components: {
     Scroll,
-    Loading
+    Loading,
+    NoResult
   },
   props: {
     query: {
@@ -80,13 +86,15 @@ export default {
       page: 1,
       result: [],
       pullup: true,
-      hasMore: true
+      hasMore: true,
+      beforeScroll: true
     }
   },
   methods: {
     search() {
       this.hasMore = true
       this.page = 1
+      this.result = []
       this.$refs.suggest.scrollTo(0, 0)
       search(this.query, this.page, this.showSinger, perpage).then((res) => {
         if (res.code === ERR_OK) {
@@ -127,6 +135,23 @@ export default {
         this.hasMore = false
       }
     },
+    selectItem(item) {
+      if (item.type === TYPE_SINGER) {
+        const singer = new Singer({
+          id: item.singermid,
+          name: item.singername
+        })
+        this.$router.push({
+          path: `/search/${singer.id}`
+        })
+        this.setSinger(singer)
+      } else {
+        this.insertSong(item)
+      }
+    },
+    listScroll() {
+      this.$emit('listScroll')
+    },
     _getResult(data) {
       if (data.zhida && data.zhida.singerid && data.song.curpage === 1) {
         this.result.push({...data.zhida, ...{type: TYPE_SINGER}})
@@ -141,7 +166,13 @@ export default {
           })
         })
       }
-    }
+    },
+    ...mapMutations({
+      setSinger: 'SET_SINGER'
+    }),
+    ...mapActions([
+      'insertSong'
+    ])
   },
   watch: {
     query() {
