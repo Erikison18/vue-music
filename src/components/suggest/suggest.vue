@@ -148,6 +148,10 @@ export default {
       } else {
         this.insertSong(item)
       }
+      this.$emit('select', this.query)
+    },
+    refresh() {
+      this.$refs.suggest.refresh()
     },
     listScroll() {
       this.$emit('listScroll')
