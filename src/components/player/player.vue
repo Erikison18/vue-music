@@ -328,11 +328,12 @@
             <i @click.stop="togglePlay" class="icon-mini" :class="miniIcon"></i>
           </ProgressCircle>
         </div>
-        <div class="control">
+        <div class="control" @click.stop="showPlayList">
           <i class="icon-playlist"></i>
         </div>
       </div>
     </transition>
+    <playlist ref="playlist"></playlist>
     <audio :src="currentSong.url" ref="audio"
     @canplay="ready" @error="error" @timeupdate="updateTime"
     @ended="end"></audio>
@@ -349,6 +350,7 @@ import {playMode} from 'common/js/config'
 import {shuffle} from 'common/js/util'
 import Lyric from 'lyric-parser'
 import Srcoll from 'base/scroll/scroll'
+import Playlist from 'components/playlist/playlist'
 
 const transform = prefixStyle('transform')
 const transitionDuration = prefixStyle('transition-duration')
@@ -357,7 +359,8 @@ export default {
   components: {
     ProgressBar,
     ProgressCircle,
-    Srcoll
+    Srcoll,
+    Playlist
   },
   computed: {
     playIcon() {
@@ -485,6 +488,9 @@ export default {
       }
       this.setCurrentIndex(index)
       this.songReady = false
+    },
+    showPlayList() {
+      this.$refs.playlist.show()
     },
     loopSoog() {
       this.$refs.audio.currentTime = 0
@@ -649,6 +655,9 @@ export default {
   },
   watch: {
     currentSong(newSong, oldSong) {
+      if (!newSong.id) {
+        return
+      }
       if (newSong.id === oldSong.id) {
         return
       }
