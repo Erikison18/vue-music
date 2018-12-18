@@ -30,7 +30,7 @@
 <template>
   <div class="search-box">
     <i class="icon-search"></i>
-    <input class="box" v-model="query" ref="query">
+    <input class="box" v-model="query" ref="query" :placeholder="placeholder">
     <i class="icon-dismiss" v-show="query" @click="clear"></i>
   </div>
 </template>
@@ -40,7 +40,7 @@ import {debounce} from 'common/js/util'
 
 export default {
   props: {
-    palceholder: {
+    placeholder: {
       type: String,
       default: '搜索歌曲、歌手'
     }
