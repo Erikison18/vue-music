@@ -9,6 +9,11 @@ import fastclick from 'fastclick'
 import store from './store'
 import 'common/stylus/index.styl'
 
+/* eslint-disable no-unused-vars */
+import VConsole from 'vconsole'
+var vConsole = new VConsole()
+console.log('test')
+
 Vue.config.productionTip = false
 fastclick.attach(document.body)
 

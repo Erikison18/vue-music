@@ -336,7 +336,7 @@
     </transition>
     <playlist ref="playlist"></playlist>
     <audio :src="currentSong.url" ref="audio"
-    @canplay="ready" @error="error" @timeupdate="updateTime"
+    @play="ready" @error="error" @timeupdate="updateTime"
     @ended="end"></audio>
   </div>
 </template>
@@ -522,6 +522,9 @@ export default {
     },
     getLyric() {
       this.currentSong.getLyric().then((lyric) => {
+        if (this.currentSong.lyric !== lyric) {
+          return
+        }
         this.currentLyric = new Lyric(lyric, this.handleLyric)
         if (this.playing) {
           this.currentLyric.play()
@@ -639,8 +642,12 @@ export default {
       }
       if (this.currentLyric) {
         this.currentLyric.stop()
+        this.currentTime = 0
+        this.playingLyric = ''
+        this.currentLineNum = 0
       }
-      setTimeout(() => {
+      clearTimeout(this.timer)
+      this.timer = setTimeout(() => {
         this.$refs.audio.play()
         this.getLyric()
       }, 1000)
